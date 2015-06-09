@@ -554,6 +554,18 @@ Proof.
       rewrite <- H. reflexivity.
 Qed.
 
+Theorem mult_plus_distr_l : forall n m p : nat,
+  p * (n + m) = (p * n) + (p * m).
+Proof.
+  intros n m p. 
+  rewrite <- mult_comm.
+  assert (H: p * n = n * p). rewrite <- mult_comm. reflexivity.
+  rewrite -> H.
+  assert (H2: p * m = m * p). rewrite <- mult_comm. reflexivity.
+  rewrite -> H2.
+  rewrite <- mult_plus_distr_r. reflexivity.
+Qed.
+
 Theorem mult_assoc : forall n m p : nat,
   n * (m * p) = (n * m) * p.
 Proof.
@@ -562,7 +574,10 @@ Proof.
     rewrite -> mult_0_r. rewrite -> mult_0_r. rewrite -> mult_0_r. reflexivity.
   Case "p = S p'".
     rewrite <- mult_fact_1.
-    rewrite -> mult_plus_distr_r.
+    rewrite <- mult_fact_1.
+    rewrite -> mult_plus_distr_l.
+    rewrite <- IHp'.
+    reflexivity.
 Qed.
 (** [] *)
 
@@ -576,7 +591,13 @@ problem using the theorem no matter which way we state it. *)
 Theorem beq_nat_refl : forall n : nat, 
   true = beq_nat n n.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n. induction n as [|n'].
+  Case "n = 0".
+    simpl. reflexivity.
+  Case "n = S n'".
+    simpl.
+    rewrite <- IHn'. reflexivity.
+Qed.
 (** [] *)
 
 (** **** Exercise: 2 stars, optional (plus_swap')  *)
@@ -594,7 +615,14 @@ Proof.
 Theorem plus_swap' : forall n m p : nat, 
   n + (m + p) = m + (n + p).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n m p.
+  rewrite -> plus_assoc.
+  replace (n + m) with (m + n).
+  rewrite -> plus_assoc.
+  reflexivity.
+  rewrite -> plus_comm. 
+  reflexivity.
+Qed.
 (** [] *)
 
 

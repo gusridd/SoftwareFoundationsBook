@@ -172,6 +172,9 @@ Inductive grumble (X:Type) : Type :=
       - [c] 
 (* FILL IN HERE *)
 *)
+Check (d mumble (b a 5)).
+Check (d bool (b a 5)).
+Check (e bool true).
 (** [] *)
 
 
@@ -299,6 +302,7 @@ Arguments snoc {X} l v.
 (* note: no _ arguments required... *)
 Definition list123'' := cons 1 (cons 2 (cons 3 nil)).
 Check (length list123'').
+Check list123''.
 
 (** *** *)
 
@@ -374,23 +378,28 @@ Definition list123''' := [1; 2; 3].
     and complete the proofs below. *)
 
 Fixpoint repeat {X : Type} (n : X) (count : nat) : list X :=
-  (* FILL IN HERE *) admit.
+  match count with
+  | O => [ ]
+  | S n' => (cons n (repeat n n'))
+  end.
 
 Example test_repeat1:
   repeat true 2 = cons true (cons true nil).
- (* FILL IN HERE *) Admitted.
+  reflexivity. Qed.
 
 Theorem nil_app : forall X:Type, forall l:list X,
   app [] l = l.
-Proof.
-  (* FILL IN HERE *) Admitted.
+Proof. reflexivity. Qed.
 
 Theorem rev_snoc : forall X : Type,
                      forall v : X,
                      forall s : list X,
   rev (snoc s v) = v :: (rev s).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros X v s. induction s as [|s'].
+  simpl. reflexivity.
+  simpl. rewrite -> IHs. simpl. reflexivity.
+Qed.
 
 Theorem rev_involutive : forall X : Type, forall l : list X,
   rev (rev l) = l.
@@ -471,7 +480,7 @@ Fixpoint combine {X Y : Type} (lx : list X) (ly : list Y)
         Eval compute in (combine [1;2] [false;false;true;true]).
       print?   []
 *)
-
+Eval compute in (combine [1;2] [false;false;true;true]).
 (** **** Exercise: 2 stars (split)  *)
 (** The function [split] is the right inverse of combine: it takes a
     list of pairs and returns a pair of lists.  In many functional
@@ -483,12 +492,15 @@ Fixpoint combine {X Y : Type} (lx : list X) (ly : list Y)
 Fixpoint split
            {X Y : Type} (l : list (X*Y))
            : (list X) * (list Y) :=
-(* FILL IN HERE *) admit.
+  match l with
+  | nil => (pair [] [])
+  | (pair a b) :: t => (pair (cons a (fst (split t)))
+                             (cons b (snd (split t))))
+  end.
 
 Example test_split:
   split [(1,false);(2,false)] = ([1;2],[false;false]).
-Proof.
-(* FILL IN HERE *) Admitted.
+Proof. reflexivity. Qed.
 (** [] *)
 
 (* ###################################################### *)
@@ -529,7 +541,10 @@ Proof. reflexivity.  Qed.
     passes the unit tests below. *)
 
 Definition hd_opt {X : Type} (l : list X)  : option X :=
-  (* FILL IN HERE *) admit.
+  match l with
+  | nil => None
+  | h :: t => Some h
+  end.
 
 (** Once again, to force the implicit arguments to be explicit,
     we can use [@] before the name of the function. *)
@@ -537,9 +552,9 @@ Definition hd_opt {X : Type} (l : list X)  : option X :=
 Check @hd_opt.
 
 Example test_hd_opt1 :  hd_opt [1;2] = Some 1.
- (* FILL IN HERE *) Admitted.
+ reflexivity. Qed.
 Example test_hd_opt2 :   hd_opt  [[1];[2]]  = Some [1].
- (* FILL IN HERE *) Admitted.
+ reflexivity. Qed.
 (** [] *)
 
 (* ###################################################### *)
@@ -629,8 +644,10 @@ Definition prod_curry {X Y Z : Type}
     the theorems below to show that the two are inverses. *)
 
 Definition prod_uncurry {X Y Z : Type}
-  (f : X -> Y -> Z) (p : X * Y) : Z :=
-  (* FILL IN HERE *) admit.
+  (f : X -> Y -> Z) (p : X * Y) : Z := 
+  match p with
+  | (pair x y) => (f x) y
+  end.
 
 (** (Thought exercise: before running these commands, can you
     calculate the types of [prod_curry] and [prod_uncurry]?) *)
@@ -641,12 +658,16 @@ Check @prod_uncurry.
 Theorem uncurry_curry : forall (X Y Z : Type) (f : X -> Y -> Z) x y,
   prod_curry (prod_uncurry f) x y = f x y.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros X Y Z.
+  intros f x y. trivial.
+Qed.
 
 Theorem curry_uncurry : forall (X Y Z : Type)
                                (f : (X * Y) -> Z) (p : X * Y),
   prod_uncurry (prod_curry f) p = f p.
 Proof.
+  intros X Y Z f p.
+  simpl.
   (* FILL IN HERE *) Admitted.
 (** [] *)
 
@@ -734,17 +755,17 @@ Proof. reflexivity.  Qed.
     [filter_even_gt7] that takes a list of natural numbers as input
     and returns a list of just those that are even and greater than
     7. *)
-
+SearchAbout bool.
 Definition filter_even_gt7 (l : list nat) : list nat :=
-  (* FILL IN HERE *) admit.
+  filter (fun e => (andb (evenb e) (negb (ble_nat e 7)))) l.
 
 Example test_filter_even_gt7_1 :
   filter_even_gt7 [1;2;6;9;10;3;12;8] = [10;12;8].
- (* FILL IN HERE *) Admitted.
+ (* FILL IN HERE *) reflexivity. Qed.
 
 Example test_filter_even_gt7_2 :
   filter_even_gt7 [5;2;6;19;129] = [].
- (* FILL IN HERE *) Admitted.
+  reflexivity. Qed.
 (** [] *)
 
 (** **** Exercise: 3 stars (partition)  *)
