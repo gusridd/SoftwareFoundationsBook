@@ -641,6 +641,63 @@ Qed.
     easier to prove, feel free to do so.) *)
 
 (* FILL IN HERE *)
+Inductive bnat : Type :=
+  | O : bnat
+  | T : bnat -> bnat
+  | ST : bnat -> bnat.
+
+Fixpoint incr_bnat (n : bnat) : bnat :=
+  match n with
+  | O => ST O
+  | T n' => ST n'
+  | ST n' => T (incr_bnat n')
+  end.
+
+Fixpoint bin2unary (b : bnat) : nat :=
+  match b with
+  | O => 0
+  | T n' => 2 * (bin2unary n')
+  | ST n' => 2 * (bin2unary n') + 1
+  end.
+
+Theorem plus_comm_n_1 : forall (n : nat), n + 1 = S n.
+Proof.
+  intros n.
+  induction n.
+  reflexivity.
+  simpl. rewrite -> IHn. reflexivity.
+Qed.
+(**
+Theorem plus_assoc : forall (a b c : nat), (a + b) + c = a + (b + c).
+Proof.
+ intros.
+ induction a. reflexivity.
+ simpl. rewrite <- IHa. reflexivity.
+Qed.
+**)
+
+Theorem bin_to_nat_pres_incribc_eq_cib :
+  forall (b : bnat), (bin2unary (incr_bnat b)) = (bin2unary b) + 1. 
+Proof.
+  intros b.
+  induction b.
+  reflexivity.
+  reflexivity.
+  simpl. rewrite -> IHb.
+  rewrite <- plus_n_O.
+  rewrite <- plus_n_O.
+  rewrite <- plus_assoc.
+  assert (H : 1 + bin2unary b = bin2unary b + 1).
+   simpl. rewrite -> plus_comm_n_1. reflexivity.
+  rewrite <- H.
+  assert (H2 : 1 + bin2unary b + bin2unary b = bin2unary b + bin2unary b + 1).
+   simpl. rewrite -> plus_comm_n_1. reflexivity.
+  rewrite <- H2. reflexivity.
+Qed.
+
+Theorem bin_to_nat_pres_incr : 
+  forall (b : bnat), (bin2unary (incr_bnat b)) = (bin2unary b) + 1.
+
 (** [] *)
 
 

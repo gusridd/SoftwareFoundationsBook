@@ -1048,13 +1048,11 @@ Proof.
   simpl. rewrite -> IHn. reflexivity.
 Qed.
 
-Theorem aux_th : forall (b : bnat), 1 + (bin2unary b + 1) = bin2unary b + 1 + 1.
+Theorem plus_assoc : forall (a b c : nat), (a + b) + c = a + (b + c).
 Proof.
- intros b.
- induction b.
- reflexivity.
- simpl. rewrite -> plus_n_O. rewrite <- plus_comm_n_1. reflexivity.
- simpl. rewrite -> plus_n_O. rewrite <- plus_comm_n_1. reflexivity.
+ intros.
+ induction a. reflexivity.
+ simpl. rewrite <- IHa. reflexivity.
 Qed.
 
 Theorem ibc_eq_cib :
@@ -1067,19 +1065,14 @@ Proof.
   simpl. rewrite -> IHb.
   rewrite -> plus_n_O.
   rewrite -> plus_n_O.
-  rewrite -> plus_comm_n_1.
-  rewrite <- plus_comm_n_1.
-  rewrite -> aux_th.
-  rewrite <- IHb.
-  
-  
-  destruct b as [b'|b''|b'''].
-  simpl. reflexivity.
-  simpl. auto. reflexivity.
-  simpl. reflexivity.
-admit.
-
-
+  rewrite <- plus_assoc.
+  assert (H : 1 + bin2unary b = bin2unary b + 1).
+   simpl. rewrite -> plus_comm_n_1. reflexivity.
+  rewrite <- H.
+  assert (H2 : 1 + bin2unary b + bin2unary b = bin2unary b + bin2unary b + 1).
+   simpl. rewrite -> plus_comm_n_1. reflexivity.
+  rewrite <- H2. reflexivity.
+Qed.
 
 (** [] *)
 

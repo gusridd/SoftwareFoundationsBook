@@ -799,6 +799,17 @@ Proof.
     simpl. rewrite -> IHl. reflexivity.
 Qed.
 
+Theorem rec_snoc : forall n : nat, forall l : natlist,
+  rev (snoc l n) = n :: (rev l).
+Proof.
+ intros. induction l as [|l'].
+ Case "l = nil".
+  reflexivity.
+ Case "l = h :: t".
+  simpl. rewrite -> IHl. simpl. reflexivity.
+Qed.
+ 
+
 Theorem rev_involutive : forall l : natlist,
   rev (rev l) = l.
 Proof.
@@ -806,7 +817,8 @@ Proof.
   Case "l = nil".
     reflexivity.
   Case "l = l' :: t".
-    simpl. SearchAbout rev. Admitted.
+    simpl. rewrite -> rec_snoc. rewrite -> IHl. reflexivity.
+Qed.
 
 
 (** There is a short solution to the next exercise.  If you find
@@ -841,7 +853,7 @@ Proof.
   Case "l2 = nil".
     simpl. rewrite -> app_nil_end. reflexivity.
   Case "l2 = h :: t".
-    simpl. simpl. Admitted.
+    simpl. rewrite -> snoc_append. SearchAbout app. simpl. Admitted.
 
 (** An exercise about your implementation of [nonzeros]: *)
 
